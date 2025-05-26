@@ -30,12 +30,17 @@ def load_dataset(folder, max_files=100):
 
 
 def piano_roll_to_midi(piano_roll, output_path, fs=8):
-    import numpy as np
     import pretty_midi
+    import numpy as np
+
+    # Auto reshape if it's flat
+    if len(piano_roll.shape) == 1 and piano_roll.shape[0] == 128 * 32:
+        print("Auto reshaping piano roll from (4096,) to (128, 32)")
+        piano_roll = piano_roll.reshape(128, 32)
 
     if len(piano_roll.shape) != 2:
         print("Error: piano_roll should be 2D. Got shape:", piano_roll.shape)
-        return  # Avoid crashing
+        return
 
     midi = pretty_midi.PrettyMIDI()
     instrument = pretty_midi.Instrument(program=0)

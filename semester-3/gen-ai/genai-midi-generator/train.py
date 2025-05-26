@@ -76,7 +76,10 @@ generator.eval()
 with torch.no_grad():
     z = torch.randn(1, latent_dim)
     generated_roll = generator(torch.randn(1, latent_dim)).detach().numpy()[0]
-    binary_roll = (generated_roll > 0.5).astype(int).reshape(128, 32)  # Fixed!
+    # Ensure shape is correct
+    if generated_roll.shape[0] != 128 * 32:
+        raise ValueError(f"Expected shape (4096,), got {generated_roll.shape}")
+    binary_roll = (generated_roll > 0.5).astype(int).reshape(128, 32)
     print("Generated roll shape:", generated_roll.shape)
     print("Binary roll shape:", binary_roll.shape)
     piano_roll_to_midi(binary_roll, "output/generated_001.mid")

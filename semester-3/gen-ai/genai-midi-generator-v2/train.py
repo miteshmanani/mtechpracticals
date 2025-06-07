@@ -7,6 +7,7 @@ from models.generator import Generator
 from models.discriminator import Discriminator
 from utils import load_dataset, piano_roll_to_midi
 import os
+import visualkeras
 
 # Config
 latent_dim = 256
@@ -14,16 +15,17 @@ note_dim = 128
 time_steps = 32
 num_keys = 24
 batch_size = 64
-epochs = 5000
+epochs = 1000
 n_critic = 5
 lr = 0.0001
 beta1, beta2 = 0.5, 0.9
 gradient_penalty_weight = 10
-output_dir = "output"
+output_dir = "C:/mtechpracticals/semester-3/gen-ai/genai-midi-generator-v2/output"
 os.makedirs(output_dir, exist_ok=True)
 
 # Load data with key labels
-data, key_labels = load_dataset('data', max_files=1000)
+data, key_labels = load_dataset(
+    'C:/mtechpracticals/semester-3/gen-ai/genai-midi-generator-v2/data', max_files=1000)
 data = torch.tensor(data, dtype=torch.float32).reshape(-1,
                                                        note_dim, time_steps)
 key_labels = torch.tensor(key_labels, dtype=torch.long)
@@ -149,3 +151,8 @@ with torch.no_grad():
         binary = (gen > 0.5).astype(int)
         piano_roll_to_midi(
             binary, f"{output_dir}/generated_final_{key_names[key_idx]}.mid")
+model = generator.state_dict()
+visualkeras.layered_view(model).show()  # display using your system viewer
+visualkeras.layered_view(model, to_file='output.png')  # write to disk
+visualkeras.layered_view(model, to_file='output.png').show()  # write and show
+visualkeras.layered_view(model)
